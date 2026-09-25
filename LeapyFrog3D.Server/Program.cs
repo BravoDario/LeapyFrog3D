@@ -1,28 +1,39 @@
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<LeapyFrog3D.Server.Services.FilamentoService>();
 
 var app = builder.Build();
 
+// Middleware para archivos est�ticos
 app.UseDefaultFiles();
-app.MapStaticAssets();
+app.UseStaticFiles();
 
-// Configure the HTTP request pipeline.
+// Swagger solo en desarrollo
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-app.MapControllers();
-
-app.MapFallbackToFile("/index.html");
+try
+{
+    app.MapControllers();
+}
+catch (ReflectionTypeLoadException ex)
+{
+    foreach (var e in ex.LoaderExceptions)
+    {
+        Console.WriteLine(e.Message);
+    }
+}
+app.MapFallbackToFile("index.html");
 
 app.Run();
