@@ -2,50 +2,65 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
-    const [forecasts, setForecasts] = useState();
+    const [filamentos, setFilamentos] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        populateWeatherData();
+        populateFilamentos();
     }, []);
 
-    const contents = forecasts === undefined
-        ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-        : <table className="table table-striped" aria-labelledby="tableLabel">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {forecasts.map(forecast =>
-                    <tr key={forecast.date}>
-                        <td>{forecast.date}</td>
-                        <td>{forecast.temperatureC}</td>
-                        <td>{forecast.temperatureF}</td>
-                        <td>{forecast.summary}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
+    async function populateFilamentos() {
+        try {
+            const response = await fetch('/api/Filamentos/inventarioFilamentos');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
 
-    return (
-        <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
-        </div>
-    );
-    
-    async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        if (response.ok) {
             const data = await response.json();
-            setForecasts(data);
+            setFilamentos(data.filamentos ?? []);
+        } catch (error) {
+            console.error('No se pudo cargar el inventario:', error);
+            setFilamentos([]);
+        } finally {
+            setLoading(false);
         }
     }
+
+    return (
+        <div className="app-shell">
+            <h1 id="tableLabel">Inventario de filamentos</h1>
+            <p>Materiales disponibles para impresión 3D.</p>
+
+            {loading ? (
+                <p><em>Cargando inventario...</em></p>
+            ) : filamentos.length === 0 ? (
+                <p><em>No hay filamentos disponibles.</em></p>
+            ) : (
+                <table className="filamentos-table" aria-labelledby="tableLabel">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Color</th>
+                            <th>Material</th>
+                            <th>Marca</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filamentos.map((filamento) => (
+                            <tr key={filamento.idFilamento}>
+                                <td>{filamento.codigo}</td>
+                                <td>{filamento.nombre}</td>
+                                <td>{filamento.color}</td>
+                                <td>{filamento.material}</td>
+                                <td>{filamento.marca}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    );
 }
 
 export default App;
