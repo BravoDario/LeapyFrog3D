@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "SJkHykLTosM=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\adria\\Documents\\Software Projects\\LeapyFrog3D\\LeapyFrog3D.Server\\LeapyFrog3D.Server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\adria\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.17\\microsoft.aspnetcore.openapi.9.0.17.nupkg.sha512",
+    "C:\\Users\\adria\\.nuget\\packages\\microsoft.aspnetcore.spaproxy\\9.0.17\\microsoft.aspnetcore.spaproxy.9.0.17.nupkg.sha512",
+    "C:\\Users\\adria\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}

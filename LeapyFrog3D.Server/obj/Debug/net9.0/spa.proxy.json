@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:49548",
+"RedirectUrl": "",
+"LaunchCommand": "npm run dev",
+"WorkingDirectory": "C:\\Users\\adria\\Documents\\Software Projects\\LeapyFrog3D\\LeapyFrog3D.Server\\..\\leapyfrog3d.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}

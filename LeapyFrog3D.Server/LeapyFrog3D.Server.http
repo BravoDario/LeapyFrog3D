@@ -1,0 +1,6 @@
+@LeapyFrog3D.Server_HostAddress = http://localhost:5183
+
+GET {{LeapyFrog3D.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
