@@ -1,0 +1,26 @@
+# .NET build output
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+*.cache
+
+# Node.js and Vite
+**/node_modules/
+**/dist/
+**/dist-ssr/
+*.local
+
+# Logs and local environment
+*.log
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.idea/
+.DS_Store
+Thumbs.db
+
+#Client / Server folders
