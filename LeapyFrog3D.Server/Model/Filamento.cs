@@ -6,11 +6,9 @@ namespace LeapyFrog3D.Server.Model
         public string Codigo { get; set; } = string.Empty;
         public string Nombre { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
-        public bool Activo { get; set; }
-
+        public double PesoGramos { get; set; }
         public int IdMarca { get; set; }
         public int IdMaterial { get; set; }
-
         public Marca? Marca { get; set; }
         public Material? Material { get; set; }
     }

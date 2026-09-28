@@ -1,6 +1,7 @@
 using LeapyFrog3D.Server.DTOs;
 using LeapyFrog3D.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LeapyFrog3D.Server.Controllers
 {
@@ -9,16 +10,29 @@ namespace LeapyFrog3D.Server.Controllers
     public class FilamentosController : ControllerBase
     {
         private readonly FilamentoService _filamentoService;
+        private readonly Logger<FilamentosController> _logger;
 
-        public FilamentosController(FilamentoService filamentoService)
+        public FilamentosController(FilamentoService filamentoService, Logger<FilamentosController> logger)
         {
             _filamentoService = filamentoService;
+            _logger = logger;
         }
 
         [HttpGet("inventarioFilamentos", Name = "inventarioFilamentos")]
-        public ActionResult<FilamentosDto> GetInventarioFilamentos()
+        public ActionResult<List<InventarioFilamentosDTO>> GetInventarioFilamentos()
         {
-            return Ok(new FilamentosDto(_filamentoService.obtenerInventarioFilamentos()));
+            try
+            {
+                List<InventarioFilamentosDTO> InventarioFilamentos = new List<InventarioFilamentosDTO>();
+                InventarioFilamentos = _filamentoService.obtenerInventarioFilamentos();
+                if (InventarioFilamentos.IsNullOrEmpty()) return BadRequest("Filamentos no encontrados");
+                return Ok(InventarioFilamentos);
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error, ex.Message);
+                return BadRequest("Algo salió mal...");
+            }
         }
     }
 }
