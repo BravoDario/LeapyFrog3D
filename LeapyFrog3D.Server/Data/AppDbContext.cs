@@ -12,6 +12,8 @@ namespace LeapyFrog3D.Server.Data
         public DbSet<Marca> Marcas => Set<Marca>();
         public DbSet<Material> Materiales => Set<Material>();
         public DbSet<Filamento> Filamentos => Set<Filamento>();
+        public DbSet<Compra> Compras => Set<Compra>();
+        public DbSet<DetalleCompra> DetallesCompra => Set<DetalleCompra>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +49,30 @@ namespace LeapyFrog3D.Server.Data
                 entity.HasOne(f => f.Material)
                     .WithMany()
                     .HasForeignKey(f => f.IdMaterial)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Compra>(entity =>
+            {
+                entity.ToTable("Compras");
+                entity.HasKey(c => c.IdCompra);
+                entity.Property(c => c.Codigo).HasMaxLength(50);
+                entity.Property(c => c.Fecha).IsRequired().HasMaxLength(50);
+
+                entity.HasMany(c => c.DetallesCompra)
+                    .WithOne()
+                    .HasForeignKey(d => d.IdCompra)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<DetalleCompra>(entity =>
+            {
+                entity.ToTable("DetallesCompra");
+                entity.HasKey(d => d.IdDetalleCompra);
+
+                entity.HasOne(d => d.Filamento)
+                    .WithMany()
+                    .HasForeignKey(d => d.IdFilamento)
                     .OnDelete(DeleteBehavior.Restrict);
             });
         }

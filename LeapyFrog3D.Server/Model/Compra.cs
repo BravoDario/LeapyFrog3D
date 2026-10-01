@@ -2,9 +2,9 @@
 {
     public class Compra
     {
-        private int IdCompra { get; set; }
-        private string Codigo { get; set; } = string.Empty;
-        private string Fecha { get; set; } = string.Empty;
-        public List<DetalleCompra>? detallesCompra;
+        public int IdCompra { get; set; }
+        public string Codigo { get; set; } = string.Empty;
+        public string Fecha { get; set; } = string.Empty;
+        public List<DetalleCompra> DetallesCompra { get; set; } = new List<DetalleCompra>();
     }
 }

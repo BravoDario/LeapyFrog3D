@@ -9,6 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<LeapyFrog3D.Server.Services.FilamentoService>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Repositorys.CompraRepository>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Services.ComprasService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>

@@ -2,10 +2,11 @@
 {
     public class DetalleCompra
     {
-        private int IdDetalleCompra {  get; set; }
-        private int IdCompra { get; set; }
-        private int IdFilamento { get; set; }
-        private double Precio {  get; set; }
+        public int IdDetalleCompra { get; set; }
+        public int IdCompra { get; set; }
+        public int IdFilamento { get; set; }
+        public double Costo { get; set; }
+        public double Peso { get; set; }
         public Filamento? Filamento { get; set; }
     }
 }
