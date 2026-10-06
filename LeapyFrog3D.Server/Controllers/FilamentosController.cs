@@ -7,16 +7,10 @@ namespace LeapyFrog3D.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class FilamentosController : ControllerBase
+    public class FilamentosController(FilamentoService filamentoService, Logger<FilamentosController> logger) : ControllerBase
     {
-        private readonly FilamentoService _filamentoService;
-        private readonly Logger<FilamentosController> _logger;
-
-        public FilamentosController(FilamentoService filamentoService, Logger<FilamentosController> logger)
-        {
-            _filamentoService = filamentoService;
-            _logger = logger;
-        }
+        private readonly FilamentoService _filamentoService = filamentoService;
+        private readonly Logger<FilamentosController> _logger = logger;
 
         [HttpGet("inventarioFilamentos", Name = "inventarioFilamentos")]
         public ActionResult<List<InventarioFilamentosDTO>> GetInventarioFilamentos()

@@ -11,6 +11,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<LeapyFrog3D.Server.Services.FilamentoService>();
 builder.Services.AddScoped<LeapyFrog3D.Server.Repositorys.CompraRepository>();
 builder.Services.AddScoped<LeapyFrog3D.Server.Services.ComprasService>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Repositorys.MarcaRepository>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Services.MarcaService>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Repositorys.MaterialRepository>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Services.MaterialService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>

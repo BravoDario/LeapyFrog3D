@@ -24,6 +24,7 @@ namespace LeapyFrog3D.Server.Data
                 entity.ToTable("Marcas");
                 entity.HasKey(m => m.IdMarca);
                 entity.Property(m => m.Nombre).IsRequired().HasMaxLength(100);
+                entity.Property(m => m.Activo).HasDefaultValue(true);
             });
 
             modelBuilder.Entity<Material>(entity =>
@@ -31,6 +32,7 @@ namespace LeapyFrog3D.Server.Data
                 entity.ToTable("Materiales");
                 entity.HasKey(m => m.IdMaterial);
                 entity.Property(m => m.Nombre).IsRequired().HasMaxLength(100);
+                entity.Property(m => m.Activo).HasDefaultValue(true);
             });
 
             modelBuilder.Entity<Filamento>(entity =>
