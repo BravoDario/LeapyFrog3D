@@ -18,7 +18,7 @@ builder.Services.AddScoped<LeapyFrog3D.Server.Services.MaterialService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
