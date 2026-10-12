@@ -6,19 +6,13 @@ namespace LeapyFrog3D.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ComprasController : ControllerBase
+    public class ComprasController(ComprasService comprasService, ILogger<ComprasController> logger) : ControllerBase
     {
-        private readonly ComprasService _comprasService;
-        private readonly ILogger<ComprasController> _logger;
-
-        public ComprasController(ComprasService comprasService, ILogger<ComprasController> logger)
-        {
-            _comprasService = comprasService;
-            _logger = logger;
-        }
+        private readonly ComprasService _comprasService = comprasService;
+        private readonly ILogger<ComprasController> _logger = logger;
 
         [HttpPost("guardarCompra", Name = "guardarCompra")]
-        public ActionResult guardarCompra(CompraDto compraDto)
+        public ActionResult GuardarCompra(CompraDto compraDto)
         {
             try
             {

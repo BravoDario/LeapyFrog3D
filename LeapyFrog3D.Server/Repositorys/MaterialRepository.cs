@@ -3,14 +3,9 @@ using LeapyFrog3D.Server.Model;
 
 namespace LeapyFrog3D.Server.Repositorys
 {
-    public class MaterialRepository
+    public class MaterialRepository(AppDbContext dbContext)
     {
-        private readonly AppDbContext _dbContext;
-
-        public MaterialRepository(AppDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        private readonly AppDbContext _dbContext = dbContext;
 
         public List<Material> obtenerMaterialesActivos()
         {
