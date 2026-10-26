@@ -11,5 +11,14 @@ namespace LeapyFrog3D.Server.Services
             };
             return inventarioFilamentos;
         }
+
+        public List<FilamentosDto> obtenerFilamentos()
+        {
+            List<FilamentoDto> filamentosDto = new List<FilamentoDto> {
+                new FilamentoDto(1, "FIL001", "PLA Blue", "Azul", "PLA", "Generic"),
+                new FilamentoDto(2, "FIL002", "PETG White", "Blanco", "PETG", "Generic")
+            };
+            return new List<FilamentosDto> { new FilamentosDto(filamentosDto) };
+        }
     }
 }

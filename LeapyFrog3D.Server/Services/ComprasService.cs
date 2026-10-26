@@ -1,114 +1,79 @@
 ﻿using LeapyFrog3D.Server.DTOs;
 using LeapyFrog3D.Server.Model;
 using LeapyFrog3D.Server.Repositorys;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LeapyFrog3D.Server.Services
 {
-    public class ComprasService(CompraRepository compraRepository, DbContext dbContext)
+    public class ComprasService
     {
-        private readonly CompraRepository _compraRepository = compraRepository;
-        private readonly DbContext _dbContext = dbContext;
+        private readonly CompraRepository _compraRepository;
 
-        public async Task<bool> guardarCompra(CompraDto compraDto)
+        public ComprasService(CompraRepository compraRepository)
         {
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            _compraRepository = compraRepository;
+        }
+
+        public bool guardarCompra(CompraDto compraDto)
+        {
+            if (compraDto == null) return false;
+
+            bool tieneFilamentos = compraDto.FilamentosComprados != null && compraDto.FilamentosComprados.Count > 0;
+            bool tieneAccesorios = compraDto.AccesoriosComprados != null && compraDto.AccesoriosComprados.Count > 0;
+
+            if (!tieneFilamentos && !tieneAccesorios) return false;
 
             try
             {
-                if (compraDto == null || (compraDto.FilamentosComprados.IsNullOrEmpty() && compraDto.AccesoriosComprados.IsNullOrEmpty()))
-                {
-                    throw new Exception("Sin datos para guardar");
-                }
-
-                if (!compraDto.FilamentosComprados.IsNullOrEmpty()) guardarFilamentos(compraDto.FilamentosComprados);
-                if (!compraDto.AccesoriosComprados.IsNullOrEmpty()) guardarAccesorios(compraDto.AccesoriosComprados);
-
-                await _dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return true;
+                Compra compra = toCompra(compraDto);
+                return _compraRepository.GuardarCompra(compra);
             }
-            catch (Exception ex)
+            catch
             {
-                await transaction.RollbackAsync();
-                throw new Exception("la compra no se pudo completar");
+                return false;
             }
-
         }
 
         private Compra toCompra(CompraDto compraDto)
         {
-            return new Compra
+            Compra compra = new Compra
             {
-                IdCompra = compraDto.IdCompra,
-                Fecha = compraDto.Fecha,
-                DetallesCompra = toLstDetallesCompra(compraDto.DetallesCompra)
+                Codigo = "COM-" + DateTime.Now.ToString("yyyyMMdd-HHmmss"),
+                Fecha = DateTime.Now.ToString("yyyy-MM-dd"),
+                DetallesCompra = new List<DetalleCompra>()
             };
-        }
 
-        private List<Model.DetalleCompra> toLstDetallesCompra(List<DTOs.DetalleCompra> detallesCompra)
-        {
-            List<Model.DetalleCompra> lstDetallesCompra = new List<Model.DetalleCompra>();
-            foreach (DTOs.DetalleCompra detalle in detallesCompra)
+            if (compraDto.FilamentosComprados != null)
             {
-                lstDetallesCompra.Add(new Model.DetalleCompra
+                foreach (FilamentoCompra fc in compraDto.FilamentosComprados)
                 {
-                    IdFilamento = detalle.Filamento?.IdFilamento ?? 0,
-                    Costo = detalle.Costo,
-                    Peso = detalle.Peso
-                });
-            }
-            return lstDetallesCompra;
-        }
+                    DetalleCompra detalle = new DetalleCompra
+                    {
+                        Piezas = fc.Piezas,
+                        Costo = fc.Costo,
+                        Cantidad = fc.Peso,
+                        IdUnidad = fc.IdUnidad
+                    };
+                    compra.DetallesCompra.Add(detalle);
 
-        private bool guardarAccesorios()
-        {
-
-        }
-
-        private bool guardarFilamentos(List<FilamentoCompra> filamentosCompra)
-        {
-            bool guardado = false;
-            foreach (FilamentoCompra filamentoCompra in filamentosCompra)
-            {
-                DetalleCompra detalleCompra = new DetalleCompra();
-                detalleCompra.Piezas= filamentoCompra.Piezas;
-                detalleCompra.Costo = filamentoCompra.Costo;
-                detalleCompra.Cantidad = filamentoCompra.Peso;
-                detalleCompra.IdUnidad = filamentoCompra.IdUnidad;
-
-                //GuardarDetalleCompra
-                //detalleCompra = _dbContext.DetalleCompra.save(detalleCompra);
-
-                Filamento filamento = new Filamento();
-                filamento.IdDetalleCompra = detalleCompra.IdDetalleCompra;
-                filamento.Codigo = generarCodigoFilamento();
-                filamento.Color = filamentoCompra.Color;
-                filamento.Cantidad = filamentoCompra.Peso;
-                filamento.IdMarca = filamentoCompra.IdMarca;
-                filamento.IdMaterial = filamentoCompra.IdMaterial;
-                
+                    Filamento filamento = new Filamento
+                    {
+                        IdDetalleCompra = detalle.IdDetalleCompra,
+                        Codigo = generarCodigoFilamento(),
+                        Color = fc.Color,
+                        Cantidad = fc.Peso,
+                        IdMarca = fc.IdMarca,
+                        IdMaterial = fc.IdMaterial
+                    };
+                    detalle.Filamento = filamento;
+                }
             }
 
-            return guardado;
-        }
-
-        private string generarCodigoCompra()
-        {
-            string codigo = "";
-
-            return codigo;
-        }
-
-        private string generarCodigoAccesorio()
-        {
-            return "";
+            return compra;
         }
 
         private string generarCodigoFilamento()
         {
-            return "";
+            return "FIL-" + DateTime.Now.ToString("yyyyMMdd-HHmmss-") + new Random().Next(1000, 9999);
         }
     }
 }

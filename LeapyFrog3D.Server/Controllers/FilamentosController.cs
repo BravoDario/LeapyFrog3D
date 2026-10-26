@@ -25,7 +25,22 @@ namespace LeapyFrog3D.Server.Controllers
             catch (Exception ex)
             {
                 _logger.Log(LogLevel.Error, ex.Message);
-                return BadRequest("Algo salió mal...");
+                return BadRequest("Algo saliï¿½ mal...");
+            }
+        }
+
+        [HttpGet(Name = "obtenerFilamentos")]
+        public ActionResult<List<FilamentosDto>> ObtenerFilamentos()
+        {
+            try
+            {
+                List<FilamentosDto> filamentos = _filamentoService.obtenerFilamentos();
+                return Ok(filamentos);
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error, ex, "Error al obtener los filamentos");
+                return BadRequest("Error al obtener los filamentos");
             }
         }
     }

@@ -6,7 +6,7 @@ namespace LeapyFrog3D.Server.Data
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options)
+            : base(options)
         {
         }
 
@@ -15,6 +15,7 @@ namespace LeapyFrog3D.Server.Data
         public DbSet<Filamento> Filamentos => Set<Filamento>();
         public DbSet<Compra> Compras => Set<Compra>();
         public DbSet<DetalleCompra> DetallesCompra => Set<DetalleCompra>();
+        public DbSet<Unidad> Unidades => Set<Unidad>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,7 +42,6 @@ namespace LeapyFrog3D.Server.Data
                 entity.ToTable("Filamentos");
                 entity.HasKey(f => f.IdFilamento);
                 entity.Property(f => f.Codigo).IsRequired().HasMaxLength(50);
-                entity.Property(f => f.Nombre).IsRequired().HasMaxLength(150);
                 entity.Property(f => f.Color).IsRequired().HasMaxLength(50);
 
                 entity.HasOne(f => f.Marca)
@@ -63,7 +63,7 @@ namespace LeapyFrog3D.Server.Data
                 entity.Property(c => c.Fecha).IsRequired().HasMaxLength(50);
 
                 entity.HasMany(c => c.DetallesCompra)
-                    .WithOne()
+                    .WithOne(d => d.Compra)
                     .HasForeignKey(d => d.IdCompra)
                     .OnDelete(DeleteBehavior.Cascade);
             });
@@ -72,11 +72,27 @@ namespace LeapyFrog3D.Server.Data
             {
                 entity.ToTable("DetallesCompra");
                 entity.HasKey(d => d.IdDetalleCompra);
+                entity.Property(d => d.Piezas).IsRequired();
+                entity.Property(d => d.Costo).IsRequired();
+                entity.Property(d => d.Cantidad).IsRequired();
+                entity.Property(d => d.IdUnidad).IsRequired();
 
                 entity.HasOne(d => d.Filamento)
+                    .WithOne(f => f.DetalleCompra)
+                    .HasForeignKey<Filamento>(f => f.IdDetalleCompra)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(d => d.Unidad)
                     .WithMany()
-                    .HasForeignKey(d => d.IdFilamento)
+                    .HasForeignKey(d => d.IdUnidad)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Unidad>(entity =>
+            {
+                entity.ToTable("Unidades");
+                entity.HasKey(u => u.IdUnidad);
+                entity.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
             });
         }
     }
