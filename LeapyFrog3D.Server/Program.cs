@@ -15,6 +15,8 @@ builder.Services.AddScoped<LeapyFrog3D.Server.Repositorys.MarcaRepository>();
 builder.Services.AddScoped<LeapyFrog3D.Server.Services.MarcaService>();
 builder.Services.AddScoped<LeapyFrog3D.Server.Repositorys.MaterialRepository>();
 builder.Services.AddScoped<LeapyFrog3D.Server.Services.MaterialService>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Repositorys.UnidadRepository>();
+builder.Services.AddScoped<LeapyFrog3D.Server.Services.UnidadService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>

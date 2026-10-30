@@ -2,70 +2,87 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { compraService } from '../../services/compraService';
+import CompraFilamento from '../components/compras/CompraFilamento';
+import CompraAccesorio from '../components/compras/CompraAccesorio';
 
 const Compra = () => {
-  const [marcas, setMarcas] = useState([]);
-  const [materiales, setMateriales] = useState([]);
+  const [tipoSeleccionado, setTipoSeleccionado] = useState('');
   const [filamentos, setFilamentos] = useState([]);
-  const [formData, setFormData] = useState({
-    fecha: new Date().toISOString().split('T')[0],
-    idFilamento: '',
-    costo: '',
-    peso: ''
-  });
+  const [accesorios, setAccesorios] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    console.log(`Compra mounted`);
-    cargarDatos();
-  }, []);
-
-  const cargarDatos = async () => {
-    try {
-      const [marcasRes, materialesRes,filamentosRes] = await Promise.all([
-        compraService.obtenerMarcas(),
-        compraService.obtenerMateriales(),
-        compraService.obtenerFilamentos()
-      ]);
-      setMarcas(marcasRes || []);
-      setMateriales(materialesRes || []);
-      setFilamentos(filamentosRes || []);
-    } catch (error) {
-      console.error('Error cargando datos:', error);
-    }
+  const handleAgregarFilamento = () => {
+    const nuevoFilamento = {
+      idMarca: 0,
+      idMaterial: 0,
+      color: '',
+      costo: 0,
+      peso: 0,
+      idUnidad: 0,
+      piezas: 1
+    };
+    setFilamentos([...filamentos, nuevoFilamento]);
+    setTipoSeleccionado('');
   };
 
-  const handleFilamentoChange = (e) => {
-    const { value } = e.target;
-    setFormData(prev => ({ ...prev, idFilamento: value }));
+  const handleAgregarAccesorio = () => {
+    const nuevoAccesorio = {
+      nombre: '',
+      cantidad: 0,
+      unidad: 0,
+      piezas: 1
+    };
+    setAccesorios([...accesorios, nuevoAccesorio]);
+    setTipoSeleccionado('');
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleFilamentoChange = (index, nuevosDatos) => {
+    const nuevosFilamentos = [...filamentos];
+    nuevosFilamentos[index] = nuevosDatos;
+    setFilamentos(nuevosFilamentos);
   };
 
-  const handleGuardar = async (e) => {
-    e.preventDefault();
+  const handleAccesorioChange = (index, nuevosDatos) => {
+    const nuevosAccesorios = [...accesorios];
+    nuevosAccesorios[index] = nuevosDatos;
+    setAccesorios(nuevosAccesorios);
+  };
+
+  const handleEliminarFilamento = (index) => {
+    const nuevosFilamentos = filamentos.filter((_, i) => i !== index);
+    setFilamentos(nuevosFilamentos);
+  };
+
+  const handleEliminarAccesorio = (index) => {
+    const nuevosAccesorios = accesorios.filter((_, i) => i !== index);
+    setAccesorios(nuevosAccesorios);
+  };
+
+  const handleGuardar = async () => {
     setLoading(true);
     try {
       const compra = {
-        detallesCompra: [{
-          filamento: { idFilamento: parseInt(formData.idFilamento) },
-          costo: parseFloat(formData.costo) || 0,
-          peso: parseFloat(formData.peso) || 0
-        }],
-        fecha: formData.fecha,
-        idCompra: 0
+        filamentosComprados: filamentos.map(f => ({
+          idMarca: f.idMarca,
+          idMaterial: f.idMaterial,
+          color: f.color,
+          costo: f.costo,
+          peso: f.peso,
+          idUnidad: f.idUnidad,
+          piezas: f.piezas
+        })),
+        accesoriosComprados: accesorios.map(a => ({
+          nombre: a.nombre,
+          cantidad: a.cantidad,
+          unidad: a.unidad,
+          piezas: a.piezas
+        }))
       };
       await compraService.guardarCompra(compra);
       alert('Compra guardada exitosamente');
-      setFormData({
-        fecha: new Date().toISOString().split('T')[0],
-        idFilamento: '',
-        costo: '',
-        peso: ''
-      });
+      setFilamentos([]);
+      setAccesorios([]);
+      setTipoSeleccionado('');
     } catch (error) {
       console.error('Error guardando compra:', error);
       alert('Error al guardar la compra');
@@ -81,77 +98,79 @@ const Compra = () => {
         <Link to="/" className="inline-block mb-6 text-blue-600 hover:text-blue-800">
           ← Volver al Inicio
         </Link>
-        <form onSubmit={handleGuardar} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Fecha
-            </label>
-            <input
-              type="date"
-              name="fecha"
-              value={formData.fecha}
-              onChange={handleInputChange}
-              required
-              className="w-full p-2 border rounded"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Filamento
-            </label>
-            <select
-              name="idFilamento"
-              value={formData.idFilamento}
-              onChange={handleFilamentoChange}
-              required
-              className="w-full p-2 border rounded"
-            >
-              <option value="">Seleccionar filamento</option>
-              {filamentos.map(f => (
-                <option key={f.idFilamento} value={f.idFilamento}>
-                  {f.codigo} - {f.nombre} ({f.color})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Costo
-            </label>
-            <input
-              type="number"
-              name="costo"
-              value={formData.costo}
-              onChange={handleInputChange}
-              step="0.01"
-              required
-              min="0"
-              className="w-full p-2 border rounded"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Peso (gramos)
-            </label>
-            <input
-              type="number"
-              name="peso"
-              value={formData.peso}
-              onChange={handleInputChange}
-              step="1"
-              required
-              min="0"
-              className="w-full p-2 border rounded"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition disabled:bg-gray-400"
+        
+        {/* Seleccionar tipo de elemento a agregar */}
+        <div className="mb-6 p-4 border rounded bg-gray-50">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Agregar elemento:
+          </label>
+          <select
+            value={tipoSeleccionado}
+            onChange={(e) => setTipoSeleccionado(e.target.value)}
+            className="w-full p-2 border rounded"
           >
-            {loading ? 'Guardando...' : 'Guardar Compra'}
-          </button>
-        </form>
+            <option value="">Seleccionar tipo...</option>
+            <option value="filamento">Filamento</option>
+            <option value="accesorio">Accesorio</option>
+          </select>
+          
+          {tipoSeleccionado === 'filamento' && (
+            <button
+              onClick={handleAgregarFilamento}
+              className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            >
+              Agregar Filamento
+            </button>
+          )}
+          
+          {tipoSeleccionado === 'accesorio' && (
+            <button
+              onClick={handleAgregarAccesorio}
+              className="mt-3 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
+            >
+              Agregar Accesorio
+            </button>
+          )}
+        </div>
+
+        {/* Lista de filamentos */}
+        {filamentos.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-3">Filamentos</h2>
+            {filamentos.map((filamento, index) => (
+              <CompraFilamento
+                key={index}
+                filamentoCompra={filamento}
+                onChange={(nuevosDatos) => handleFilamentoChange(index, nuevosDatos)}
+                onDelete={() => handleEliminarFilamento(index)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Lista de accesorios */}
+        {accesorios.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-3">Accesorios</h2>
+            {accesorios.map((accesorio, index) => (
+              <CompraAccesorio
+                key={index}
+                accesorioCompra={accesorio}
+                onChange={(nuevosDatos) => handleAccesorioChange(index, nuevosDatos)}
+                onDelete={() => handleEliminarAccesorio(index)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Botón guardar */}
+        <button
+          onClick={handleGuardar}
+          disabled={loading || (filamentos.length === 0 && accesorios.length === 0)}
+          className="w-full py-3 bg-green-500 text-white rounded hover:bg-green-600 transition disabled:bg-gray-400"
+        >
+          {loading ? 'Guardando...' : 'Guardar Compra'}
+        </button>
       </div>
     </div>
   );

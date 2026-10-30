@@ -12,4 +12,13 @@ export const compraService = {
     const response = await api.get('/filamentos');
     return response.data?.[0]?.filamentos || [];
   },
+  obtenerUnidades: async () => {
+    try {
+      const response = await api.get('/unidades');
+      return response.data || [];
+    } catch (error) {
+      console.error('Error obteniendo unidades:', error);
+      return [];
+    }
+  },
 };
